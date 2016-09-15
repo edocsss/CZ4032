@@ -1,0 +1,5 @@
+Link: cz4032-ubiku.rhcloud.com/phpmyadmin/
+MySQL Details:
+- Username: admini9eesFs
+- Password: ue1tA9tcZ4JZ
+- DB Name: cz4032

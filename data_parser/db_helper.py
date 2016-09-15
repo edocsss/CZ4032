@@ -459,7 +459,6 @@ def create_words_table(cursor):
 
 def insert_user(cursor, user):
     try:
-        print(user)
         cursor.execute(INSERT_USER_SQL, user)
 
     except mysql.connector.Error as e:
@@ -469,7 +468,6 @@ def insert_user(cursor, user):
 
 def insert_word(cursor, word):
     try:
-        print(word)
         cursor.execute(INSERT_WORD_SQL, word)
 
     except mysql.connector.Error as e:
