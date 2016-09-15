@@ -25,5 +25,5 @@ if __name__ == '__main__':
 
     conn.commit()
 
-    db_helper.close_cursor(cursor)
+    # db_helper.close_cursor(cursor)
     db_helper.close_db_connection(conn)
