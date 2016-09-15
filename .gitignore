@@ -90,4 +90,4 @@ ENV/
 
 .DS_Store
 .idea
-data
+data_parser/mysql_config.json

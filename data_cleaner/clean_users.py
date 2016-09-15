@@ -15,7 +15,7 @@ def load_users_data():
 def fill_user_age(user):
     age = user['AGE']
     if pd.isnull(age):
-        return 'NA'
+        return -1
     else:
         return age
 
@@ -23,7 +23,7 @@ def fill_user_age(user):
 def fill_user_working(user):
     employment = user['WORKING']
     if pd.isnull(employment):
-        return 'NA'
+        return 'Not Available'
     else:
         return employment
 
@@ -31,7 +31,7 @@ def fill_user_working(user):
 def fill_user_region(user):
     region = user['REGION']
     if pd.isnull(region):
-        return 'NA'
+        return 'Not Available'
     else:
         return region
 
@@ -71,14 +71,14 @@ def fill_empty_question(user, q_col, q_mean):
 
 
 def clean_list_own_and_back(users_df):
-    users_df['LIST_OWN_CLEANED'] = users_df.apply(clean_list_playback, axis=1, args=('LIST_OWN',))
-    users_df['LIST_BACK_CLEANED'] = users_df.apply(clean_list_playback, axis=1, args=('LIST_BACK',))
+    users_df['LIST_OWN'] = users_df.apply(clean_list_playback, axis=1, args=('LIST_OWN',))
+    users_df['LIST_BACK'] = users_df.apply(clean_list_playback, axis=1, args=('LIST_BACK',))
 
-    users_list_own_mean = users_df['LIST_OWN_CLEANED'].mean()
-    users_list_back_mean = users_df['LIST_BACK_CLEANED'].mean()
+    users_list_own_mean = users_df['LIST_OWN'].mean()
+    users_list_back_mean = users_df['LIST_BACK'].mean()
 
-    users_df['LIST_OWN_CLEANED'] = users_df.apply(fill_empty_list_playback, axis=1, args=('LIST_OWN_CLEANED', users_list_own_mean))
-    users_df['LIST_BACK_CLEANED'] = users_df.apply(fill_empty_list_playback, axis=1, args=('LIST_BACK_CLEANED', users_list_back_mean))
+    users_df['LIST_OWN'] = users_df.apply(fill_empty_list_playback, axis=1, args=('LIST_OWN', users_list_own_mean))
+    users_df['LIST_BACK'] = users_df.apply(fill_empty_list_playback, axis=1, args=('LIST_BACK', users_list_back_mean))
 
     return users_df
 
@@ -87,7 +87,7 @@ def clean_questions(users_df):
     for i in range (1, 20):
         col_name = 'Q' + str(i)
         q_mean = users_df[col_name].mean()
-        users_df[col_name + '_CLEANED'] = users_df.apply(fill_empty_question, axis=1, args=(col_name, q_mean))
+        users_df[col_name] = users_df.apply(fill_empty_question, axis=1, args=(col_name, q_mean))
 
     return users_df
 
@@ -107,16 +107,16 @@ if __name__ == '__main__':
     users_df = load_users_data()
 
     print("Cleaning users age..")
-    users_df['AGE_CLEANED'] = users_df.apply(fill_user_age, axis=1)
+    users_df['AGE'] = users_df.apply(fill_user_age, axis=1)
 
     print("Cleaning working..")
-    users_df['WORKING_CLEANED'] = users_df.apply(fill_user_working, axis=1)
+    users_df['WORKING'] = users_df.apply(fill_user_working, axis=1)
 
     print("Cleaning region..")
-    users_df['REGION_CLEANED'] = users_df.apply(fill_user_region, axis=1)
+    users_df['REGION'] = users_df.apply(fill_user_region, axis=1)
 
-    print("Encoding music..")
-    users_df['MUSIC_ENCODED'] = users_df.apply(encode_user_music, axis=1)
+    # print("Encoding music..")
+    # users_df['MUSIC'] = users_df.apply(encode_user_music, axis=1)
 
     print("Cleaning list own and list back..")
     users_df = clean_list_own_and_back(users_df)

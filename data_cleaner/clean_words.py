@@ -30,7 +30,7 @@ def fill_empty_own_artist_music(word):
 
 def clean_like_artist(words_df):
     like_artist_mean = words_df['LIKE_ARTIST'].mean()
-    words_df['LIKE_ARTIST_CLEANED'] = words_df.apply(fill_empty_like_artist, axis=1, args=(like_artist_mean,))
+    words_df['LIKE_ARTIST'] = words_df.apply(fill_empty_like_artist, axis=1, args=(like_artist_mean,))
     return words_df
 
 
@@ -59,11 +59,14 @@ if __name__ == '__main__':
     print("Loading words..")
     words_df = load_words_data()
 
+    print("Dropping 'Good Lyrics' column since it is duplicated..")
+    words_df = words_df.drop('Good Lyrics', axis=1)
+
     print("Filling in empty heard of..")
-    words_df['HEARD_OF_CLEANED'] = words_df.apply(fill_empty_heard_of, axis=1)
+    words_df['HEARD_OF'] = words_df.apply(fill_empty_heard_of, axis=1)
 
     print("Filling in empty own artist music..")
-    words_df['OWN_ARTIST_MUSIC_CLEANED'] = words_df.apply(fill_empty_heard_of, axis=1)
+    words_df['OWN_ARTIST_MUSIC'] = words_df.apply(fill_empty_heard_of, axis=1)
 
     print("Filling in empty like artist..")
     words_df = clean_like_artist(words_df)
@@ -113,7 +116,6 @@ if __name__ == '__main__':
         'Dark',
         'Passionate',
         'Not authentic',
-        'Good Lyrics',
         'Background',
         'Timeless',
         'Depressing',
@@ -155,7 +157,7 @@ if __name__ == '__main__':
 
     for adj in adjectives:
         print("Filling in empty '{}'..".format(adj))
-        words_df[adj + '_CLEANED'] = words_df.apply(fill_empty_adjectives, axis=1, args=(adj,))
+        words_df[adj] = words_df.apply(fill_empty_adjectives, axis=1, args=(adj,))
 
 
     print("Writing cleaned data to CSV file..")
