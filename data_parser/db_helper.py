@@ -9,6 +9,17 @@ f = open(os.path.join(os.getcwd(), 'mysql_config.json'), 'r')
 CONNECTION_INFO = json.load(f)
 f.close()
 
+CREATE_TRAIN_TABLE_SQL = """
+    CREATE TABLE `train` (
+        `artist` int(100),
+        `track` int(100),
+        `user` int(100),
+        `rating` int(100),
+        `time` int(100),
+        PRIMARY KEY (artist, track, user)
+    )
+"""
+
 CREATE_USERS_TABLE_SQL = """
     CREATE TABLE `users` (
         `id` int(100) PRIMARY KEY,
@@ -131,6 +142,22 @@ CREATE_WORDS_TABLE_SQL = """
         `arrogant` int(5),
         `warm` int(5),
         `soulful` int(5)
+    )
+"""
+
+INSERT_TRAIN_SQL = """
+    INSERT INTO train (
+        artist,
+        track,
+        user,
+        rating,
+        time
+    ) VALUES (
+        %(artist)s,
+        %(track)s,
+        %(user)s,
+        %(rating)s,
+        %(time)s
     )
 """
 
@@ -429,6 +456,21 @@ def is_db_exist(conn):
     return False
 
 
+def create_train_table(cursor):
+    try:
+        print("Creating table: train")
+        cursor.execute(CREATE_TRAIN_TABLE_SQL)
+
+    except mysql.connector.Error as e:
+        if e.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+            print("Table train already exists!")
+            print()
+
+        else:
+            print(e.msg)
+            print()
+
+
 def create_users_table(cursor):
     try:
         print("Creating table: users")
@@ -438,6 +480,7 @@ def create_users_table(cursor):
         if e.errno == errorcode.ER_TABLE_EXISTS_ERROR:
             print("Table users already exists!")
             print()
+
         else:
             print(e.msg)
             print()
@@ -452,9 +495,19 @@ def create_words_table(cursor):
         if e.errno == errorcode.ER_TABLE_EXISTS_ERROR:
             print("Table words already exists!")
             print()
+
         else:
             print(e.msg)
             print()
+
+
+def insert_train(cursor, train):
+    try:
+        cursor.execute(INSERT_TRAIN_SQL, train)
+
+    except mysql.connector.Error as e:
+        print(e.msg)
+        print()
 
 
 def insert_user(cursor, user):

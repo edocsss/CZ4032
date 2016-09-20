@@ -5,6 +5,12 @@ import pandas as pd
 DATA_DIR_PATH = '../data'
 
 
+def load_train_data():
+    TRAIN_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'train.csv')
+    train_df = pd.read_csv(TRAIN_DATA_FILE_PATH)
+    return train_df
+
+
 def load_users_data():
     USERS_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned.csv')
     users_df = pd.read_csv(USERS_DATA_FILE_PATH)
@@ -15,6 +21,16 @@ def load_words_data():
     MUSICS_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned.csv')
     musics_df = pd.read_csv(MUSICS_DATA_FILE_PATH)
     return musics_df
+
+
+def convert_train_series_to_dict(i, train_series):
+    return {
+        'artist': train_series['Artist'],
+        'track': train_series['Track'],
+        'user': train_series['User'],
+        'rating': train_series['Rating'],
+        'time': train_series['Time']
+    }
 
 
 def convert_users_series_to_dict(i, user_series):
