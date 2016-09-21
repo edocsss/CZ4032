@@ -14,6 +14,6 @@
 ```
 
 - More information on Openshift Port Forwarding can be found in https://blog.openshift.com/getting-started-with-port-forwarding-on-openshift/
-- Make sure you run the ```data_cleaner``` first to generate ```users_cleaned.csv``` and ```words_cleaned.csv```.
+- Make sure you run the ```data_cleaner``` first to generate ```users_cleaned_2.csv``` and ```words_cleaned.csv```.
 
 **Note:** the value ```NA``` is somehow considered as Pandas ```NaN``` value!!

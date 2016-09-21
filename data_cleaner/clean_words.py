@@ -20,12 +20,16 @@ def fill_empty_heard_of(word):
         return heard_of
 
 
-def encode_word_one_hot(word):
+def encode_word(word, use_binary=False):
     heard_of = word['HEARD_OF'].lower()
-    heard_of_encoded = encoding.HEARD_OF_MAP[heard_of]
-
     own_artist_music = word['OWN_ARTIST_MUSIC'].lower()
-    own_artist_music_encoded = encoding.OWN_ARTIST_MAP[own_artist_music]
+
+    if use_binary:
+        heard_of_encoded = encoding.HEARD_OF_BINARY_MAP[heard_of]
+        own_artist_music_encoded = encoding.OWN_ARTIST_BINARY_MAP[own_artist_music]
+    else:
+        heard_of_encoded = encoding.HEARD_OF_ONEHOT_MAP[heard_of]
+        own_artist_music_encoded = encoding.OWN_ARTIST_ONEHOT_MAP[own_artist_music]
 
     for i in range(0, len(heard_of_encoded)):
         word['HEARD_OF_' + str(i)] = heard_of_encoded[i]
@@ -67,7 +71,7 @@ def fill_empty_adjectives(word, adj):
 
 
 def write_users_df_to_csv(words_df):
-    WORDS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned.csv')
+    WORDS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned_binary.csv')
     words_df.to_csv(WORDS_CLEANED_DATA_FILE_PATH, sep=',', encoding='utf-8')
 
 
@@ -88,7 +92,7 @@ if __name__ == '__main__':
     words_df['LIKE_ARTIST'] = clean_like_artist(words_df)
 
     print("Encoding non integer fields..")
-    words_df = words_df.apply(encode_word_one_hot, axis=1)
+    words_df = words_df.apply(encode_word, axis=1, args=(True,))
 
     adjectives = [
         'Uninspired',

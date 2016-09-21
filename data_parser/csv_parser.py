@@ -12,7 +12,7 @@ def load_train_data():
 
 
 def load_users_data():
-    USERS_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned.csv')
+    USERS_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned_2.csv')
     users_df = pd.read_csv(USERS_DATA_FILE_PATH)
     return users_df
 

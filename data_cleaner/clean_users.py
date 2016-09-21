@@ -93,18 +93,22 @@ def clean_questions(users_df):
     return users_df
 
 
-def encode_user_one_hot(user):
+def encode_user_one_hot(user, use_binary=False):
     gender = user['GENDER'].lower()
-    gender_encoded = encoding.GENDER_MAP[gender]
-
     working = user['WORKING'].lower()
-    working_encoded = encoding.WORKING_MAP[working]
-
     region = user['REGION'].lower()
-    region_encoded = encoding.REGION_MAP[region]
-
     music = user['MUSIC'].lower()
-    music_encoded = encoding.MUSIC_MAP[music]
+
+    if use_binary:
+        gender_encoded = encoding.GENDER_BINARY_MAP[gender]
+        working_encoded = encoding.WORKING_BINARY_MAP[working]
+        region_encoded = encoding.REGION_BINARY_MAP[region]
+        music_encoded = encoding.MUSIC_BINARY_MAP[music]
+    else:
+        gender_encoded = encoding.GENDER_ONEHOT_MAP[gender]
+        working_encoded = encoding.WORKING_ONEHOT_MAP[working]
+        region_encoded = encoding.REGION_ONEHOT_MAP[region]
+        music_encoded = encoding.MUSIC_ONEHOT_MAP[music]
 
     for i in range(0, len(gender_encoded)):
         user['GENDER_' + str(i)] = gender_encoded[i]
@@ -146,9 +150,7 @@ if __name__ == '__main__':
     users_df = clean_questions(users_df)
 
     print("Encoding non integer fields..")
-    start = time.time()
-    users_df = users_df.apply(encode_user_one_hot, axis=1)
-    print("Time: {}".format(time.time() - start))
+    users_df = users_df.apply(encode_user_one_hot, axis=1, args=(False,))
 
     print("Writing cleaned data to CSV file..")
     write_users_df_to_csv(users_df)
