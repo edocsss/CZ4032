@@ -1,7 +1,7 @@
 import pandas as pd
 import os
-import encoding.users as users_encoding
-
+from data_cleaner import encoding
+import utils
 
 DATA_DIR_PATH = '../data'
 
@@ -18,6 +18,22 @@ def fill_empty_heard_of(word):
         return 'Never heard of'
     else:
         return heard_of
+
+
+def encode_word_one_hot(word):
+    heard_of = word['HEARD_OF'].lower()
+    heard_of_encoded = encoding.HEARD_OF_MAP[heard_of]
+
+    own_artist_music = word['OWN_ARTIST_MUSIC'].lower()
+    own_artist_music_encoded = encoding.OWN_ARTIST_MAP[own_artist_music]
+
+    for i in range(0, len(heard_of_encoded)):
+        word['HEARD_OF_' + str(i)] = heard_of_encoded[i]
+
+    for j in range(0, len(own_artist_music_encoded)):
+        word['OWN_ARTIST_MUSIC_' + str(j)] = own_artist_music_encoded[j]
+
+    return word
 
 
 def fill_empty_own_artist_music(word):
@@ -47,7 +63,7 @@ def fill_empty_adjectives(word, adj):
     if pd.isnull(adjective):
         return 2
     else:
-        return int(adjective)
+        return adjective
 
 
 def write_users_df_to_csv(words_df):
@@ -66,10 +82,13 @@ if __name__ == '__main__':
     words_df['HEARD_OF'] = words_df.apply(fill_empty_heard_of, axis=1)
 
     print("Filling in empty own artist music..")
-    words_df['OWN_ARTIST_MUSIC'] = words_df.apply(fill_empty_heard_of, axis=1)
+    words_df['OWN_ARTIST_MUSIC'] = words_df.apply(fill_empty_own_artist_music, axis=1)
 
     print("Filling in empty like artist..")
-    words_df = clean_like_artist(words_df)
+    words_df['LIKE_ARTIST'] = clean_like_artist(words_df)
+
+    print("Encoding non integer fields..")
+    words_df = words_df.apply(encode_word_one_hot, axis=1)
 
     adjectives = [
         'Uninspired',
@@ -159,9 +178,5 @@ if __name__ == '__main__':
         print("Filling in empty '{}'..".format(adj))
         words_df[adj] = words_df.apply(fill_empty_adjectives, axis=1, args=(adj,))
 
-
     print("Writing cleaned data to CSV file..")
     write_users_df_to_csv(words_df)
-
-    print()
-    print(words_df.head(100))

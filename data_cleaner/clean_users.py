@@ -1,6 +1,7 @@
 import pandas as pd
 import os
-import encoding.users as users_encoding
+import time
+from data_cleaner import encoding
 
 
 DATA_DIR_PATH = '../data'
@@ -92,9 +93,32 @@ def clean_questions(users_df):
     return users_df
 
 
-def encode_user_music(user):
-    music_importance = user['MUSIC']
-    return users_encoding.MUSIC_ENCODING_MAP[music_importance]
+def encode_user_one_hot(user):
+    gender = user['GENDER'].lower()
+    gender_encoded = encoding.GENDER_MAP[gender]
+
+    working = user['WORKING'].lower()
+    working_encoded = encoding.WORKING_MAP[working]
+
+    region = user['REGION'].lower()
+    region_encoded = encoding.REGION_MAP[region]
+
+    music = user['MUSIC'].lower()
+    music_encoded = encoding.MUSIC_MAP[music]
+
+    for i in range(0, len(gender_encoded)):
+        user['GENDER_' + str(i)] = gender_encoded[i]
+
+    for j in range(0, len(working_encoded)):
+        user['WORKING_' + str(j)] = working_encoded[j]
+
+    for k in range(0, len(region_encoded)):
+        user['REGION_' + str(k)] = region_encoded[k]
+
+    for l in range(0, len(music_encoded)):
+        user['MUSIC_' + str(l)] = music_encoded[l]
+
+    return user
 
 
 def write_users_df_to_csv(users_df):
@@ -115,14 +139,16 @@ if __name__ == '__main__':
     print("Cleaning region..")
     users_df['REGION'] = users_df.apply(fill_user_region, axis=1)
 
-    # print("Encoding music..")
-    # users_df['MUSIC'] = users_df.apply(encode_user_music, axis=1)
-
     print("Cleaning list own and list back..")
     users_df = clean_list_own_and_back(users_df)
 
     print("Cleaning questions..")
     users_df = clean_questions(users_df)
+
+    print("Encoding non integer fields..")
+    start = time.time()
+    users_df = users_df.apply(encode_user_one_hot, axis=1)
+    print("Time: {}".format(time.time() - start))
 
     print("Writing cleaned data to CSV file..")
     write_users_df_to_csv(users_df)
