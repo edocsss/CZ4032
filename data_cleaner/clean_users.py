@@ -24,7 +24,7 @@ def fill_user_age(user):
     user['AGE_RANGE_66-'] = 0
 
     if not pd.isnull(age):
-        age = age.astype(int)
+        age = int(age)
 
         if age <= 15:
             user['AGE_RANGE_0-15'] = 1
