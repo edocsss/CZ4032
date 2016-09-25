@@ -121,7 +121,11 @@ def encode_user_one_hot(user, use_binary=False):
     for l in range(0, len(music_encoded)):
         user['MUSIC_' + str(l)] = music_encoded[l]
 
+    return user
+
+def classify_age(user):
     age = int(user['AGE'])
+
     user['AGE_RANGE_0-15'] = 0
     user['AGE_RANGE_16-25'] = 0
     user['AGE_RANGE_26-35'] = 0
@@ -130,7 +134,8 @@ def encode_user_one_hot(user, use_binary=False):
     user['AGE_RANGE_56-65'] = 0
     user['AGE_RANGE_66-'] = 0
 
-    if age <= 15:
+    # Ignore ageless user
+    if 0 <= age <= 15:
         user['AGE_RANGE_0-15'] = 1
     elif age <= 25:
         user['AGE_RANGE_16-25'] = 1
@@ -174,6 +179,9 @@ if __name__ == '__main__':
 
     print("Encoding non integer fields..")
     users_df = users_df.apply(encode_user_one_hot, axis=1, args=(False,))
+
+    print('Classifying age...')
+    users_df = users_df.apply(classify_age, axis=1)
 
     print("Writing cleaned data to CSV file..")
     write_users_df_to_csv(users_df)
