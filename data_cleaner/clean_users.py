@@ -135,7 +135,10 @@ def classify_age(user):
     user['AGE_RANGE_66-'] = 0
 
     # Ignore ageless user
-    if 0 <= age <= 15:
+    if age < 0:
+        pass
+
+    elif age <= 15:
         user['AGE_RANGE_0-15'] = 1
     elif age <= 25:
         user['AGE_RANGE_16-25'] = 1
