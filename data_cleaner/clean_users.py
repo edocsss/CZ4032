@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import time
-from data_cleaner import encoding
+import encoding
 
 
 DATA_DIR_PATH = '../data'
@@ -14,34 +14,10 @@ def load_users_data():
 
 def fill_user_age(user):
     age = user['AGE']
-
-    user['AGE_RANGE_0-15'] = 0
-    user['AGE_RANGE_16-25'] = 0
-    user['AGE_RANGE_26-35'] = 0
-    user['AGE_RANGE_36-45'] = 0
-    user['AGE_RANGE_46-55'] = 0
-    user['AGE_RANGE_56-65'] = 0
-    user['AGE_RANGE_66-'] = 0
-
-    if not pd.isnull(age):
-        age = int(age)
-
-        if age <= 15:
-            user['AGE_RANGE_0-15'] = 1
-        elif age <= 25:
-            user['AGE_RANGE_16-25'] = 1
-        elif age <= 35:
-            user['AGE_RANGE_26-35'] = 1
-        elif age <= 45:
-            user['AGE_RANGE_36-45'] = 1
-        elif age <= 55:
-            user['AGE_RANGE_46-55'] = 1
-        elif age <= 65:
-            user['AGE_RANGE_56-65'] = 1
-        else:
-            user['AGE_RANGE_66-'] = 1
-
-    return user
+    if pd.isnull(age):
+        return -1
+    else:
+        return age
 
 
 def fill_user_working(user):
@@ -145,11 +121,35 @@ def encode_user_one_hot(user, use_binary=False):
     for l in range(0, len(music_encoded)):
         user['MUSIC_' + str(l)] = music_encoded[l]
 
+    age = int(user['AGE'])
+    user['AGE_RANGE_0-15'] = 0
+    user['AGE_RANGE_16-25'] = 0
+    user['AGE_RANGE_26-35'] = 0
+    user['AGE_RANGE_36-45'] = 0
+    user['AGE_RANGE_46-55'] = 0
+    user['AGE_RANGE_56-65'] = 0
+    user['AGE_RANGE_66-'] = 0
+
+    if age <= 15:
+        user['AGE_RANGE_0-15'] = 1
+    elif age <= 25:
+        user['AGE_RANGE_16-25'] = 1
+    elif age <= 35:
+        user['AGE_RANGE_26-35'] = 1
+    elif age <= 45:
+        user['AGE_RANGE_36-45'] = 1
+    elif age <= 55:
+        user['AGE_RANGE_46-55'] = 1
+    elif age <= 65:
+        user['AGE_RANGE_56-65'] = 1
+    else:
+        user['AGE_RANGE_66-'] = 1
+
     return user
 
 
 def write_users_df_to_csv(users_df):
-    USERS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned.csv')
+    USERS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned_onehot.csv')
     users_df.to_csv(USERS_CLEANED_DATA_FILE_PATH, sep=',', encoding='utf-8')
 
 
