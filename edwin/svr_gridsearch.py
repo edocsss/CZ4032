@@ -3,17 +3,14 @@ from sklearn.svm import SVR
 from sklearn import cross_validation
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
+import json
 
 
 KERNELS = ['rbf', 'poly', 'sigmoid']
 tuned_parameters = [
     {
-        'kernel': ['rbf'],
-        'gamma': [1e-3, 1e-4],
-        'C': [1, 10, 100, 1000]
-    },
-    {
-        'kernel': ['linear'],
+        'kernel': ['rbf', 'poly'],
+        'gamma': [1e-4],
         'C': [1, 10, 100, 1000]
     }
 ]
@@ -21,7 +18,7 @@ tuned_parameters = [
 
 def run_svr_training(use_binary, file_name):
     X_matrix, Y_matrix = data_util.get_X_and_Y_matrices(use_binary)
-    X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X_matrix, Y_matrix, test_size=0.7)
+    X_train, X_test, Y_train, Y_test = cross_validation.train_test_split(X_matrix, Y_matrix, train_size=0.7)
 
     f = open('results/' + file_name, 'w')
 
@@ -30,14 +27,15 @@ def run_svr_training(use_binary, file_name):
         tuned_parameters,
         cv=3,
         scoring='mean_squared_error',
-        verbose=10
+        verbose=10,
+        n_jobs=3
     )
 
     clf.fit(X_train, Y_train)
     print('Best parameters set found on the testing set:')
     f.write('Best parameters set found on the testing set:\n')
     print(clf.best_params_)
-    f.write(clf.best_params_)
+    f.write(json.dumps(clf.best_params_))
     f.write('\n\n')
 
     print('Grid scores:')
@@ -49,7 +47,7 @@ def run_svr_training(use_binary, file_name):
 
     Y_true, Y_pred = Y_test, clf.predict(X_test)
     print(classification_report(Y_true, Y_pred))
-    f.write(classification_report(Y_true, Y_pred))
+    f.write(json.dumps(classification_report(Y_true, Y_pred)))
     f.close()
 
 
@@ -62,13 +60,4 @@ def run_svr_training_onehot():
 
 
 if __name__ == '__main__':
-    # t_binary = threading.Thread(target=run_svr_training_binary)
-    # t_onehot = threading.Thread(target=run_svr_training_onehot)
-    #
-    # t_binary.start()
-    # t_onehot.start()
-    #
-    # t_binary.join()
-    # t_onehot.join()
-
     run_svr_training_binary()
