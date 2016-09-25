@@ -41,6 +41,8 @@ def fill_user_age(user):
         else:
             user['AGE_RANGE_66-'] = 1
 
+    return user
+
 
 def fill_user_working(user):
     employment = user['WORKING']
