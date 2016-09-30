@@ -1,7 +1,6 @@
 import pandas as pd
 import os
-from data_cleaner import encoding
-import utils
+import encoding
 
 DATA_DIR_PATH = '../data'
 
@@ -56,10 +55,12 @@ def clean_like_artist(words_df):
 
 def fill_empty_like_artist(word, like_artist_mean):
     own_artist_music = word['OWN_ARTIST_MUSIC']
-    if own_artist_music in ['Own a little of their music', 'Own a lot of their music', 'Own all or most of their music']:
-        return like_artist_mean
+
+    like_artist = word['LIKE_ARTIST']
+    if not pd.isnull(like_artist):
+        return like_artist
     else:
-        return 0
+        return like_artist_mean
 
 
 def fill_empty_adjectives(word, adj):
@@ -71,7 +72,7 @@ def fill_empty_adjectives(word, adj):
 
 
 def write_users_df_to_csv(words_df):
-    WORDS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned_binary.csv')
+    WORDS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned_onehot.csv')
     words_df.to_csv(WORDS_CLEANED_DATA_FILE_PATH, sep=',', encoding='utf-8')
 
 
@@ -89,10 +90,10 @@ if __name__ == '__main__':
     words_df['OWN_ARTIST_MUSIC'] = words_df.apply(fill_empty_own_artist_music, axis=1)
 
     print("Filling in empty like artist..")
-    words_df['LIKE_ARTIST'] = clean_like_artist(words_df)
+    words_df = clean_like_artist(words_df)
 
     print("Encoding non integer fields..")
-    words_df = words_df.apply(encode_word, axis=1, args=(True,))
+    words_df = words_df.apply(encode_word, axis=1, args=(False,))
 
     adjectives = [
         'Uninspired',
