@@ -157,7 +157,7 @@ def classify_age(user):
 
 
 def write_users_df_to_csv(users_df):
-    USERS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned_binary.csv')
+    USERS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'users_cleaned_onehot.csv')
     users_df.to_csv(USERS_CLEANED_DATA_FILE_PATH, sep=',', encoding='utf-8')
 
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     users_df = clean_questions(users_df)
 
     print("Encoding non integer fields..")
-    users_df = users_df.apply(encode_user_one_hot, axis=1, args=(True,))
+    users_df = users_df.apply(encode_user_one_hot, axis=1, args=(False,))
 
     print('Classifying age...')
     users_df = users_df.apply(classify_age, axis=1)
