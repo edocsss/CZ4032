@@ -54,8 +54,6 @@ def clean_like_artist(words_df):
 
 
 def fill_empty_like_artist(word, like_artist_mean):
-    own_artist_music = word['OWN_ARTIST_MUSIC']
-
     like_artist = word['LIKE_ARTIST']
     if not pd.isnull(like_artist):
         return like_artist
