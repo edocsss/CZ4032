@@ -80,9 +80,6 @@ def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
             'Time',
             ],
         )
-    for col in range(1, 82):
-        replacement = test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]!=2.,col].mean()
-        test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]==2.,col] = replacement
     dataset = all_table_innerjoin.as_matrix().astype(float)
     dataset_size = dataset.shape[0]
     if shuffle:
