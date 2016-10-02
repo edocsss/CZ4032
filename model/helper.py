@@ -4,7 +4,7 @@ import math
 import pandas
 import numpy as np
 
-def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
+def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot', debug=False):
     users_table_path = os.path.join(os.getcwd(), '../data/users_cleaned_%s.csv' % suffix)
     words_table_path = os.path.join(os.getcwd(), '../data/words_cleaned_%s.csv' % suffix)
     train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
@@ -80,6 +80,9 @@ def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
             'Time',
             ],
         )
+    # For debugging purpose
+    if debug:
+        return all_table_innerjoin, test_table_innerjoin
     dataset = all_table_innerjoin.as_matrix().astype(float)
     dataset_size = dataset.shape[0]
     if shuffle:
