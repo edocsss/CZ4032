@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import time
 from data_cleaner import encoding
-
+import encoding
 
 DATA_DIR_PATH = '../data'
 
@@ -15,9 +15,9 @@ def load_users_data():
 def fill_user_age(user):
     age = user['AGE']
     if pd.isnull(age):
-        return 11
+        return -1
     else:
-        return int(age / 10)
+        return age
 
 
 def fill_user_working(user):

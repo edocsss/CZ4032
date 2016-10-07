@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from data_cleaner import encoding
 import encoding
 
 DATA_DIR_PATH = '../data'
@@ -34,7 +35,7 @@ def encode_word(word, use_binary=False):
         word['HEARD_OF_' + str(i)] = heard_of_encoded[i]
 
     for j in range(0, len(own_artist_music_encoded)):
-        word['OWN_ARTIST_MUSIC_' + str(j)] = own_artist_music_encoded[j]
+        word['OWN_ARTIST_`MUSIC_' + str(j)] = own_artist_music_encoded[j]
 
     return word
 
@@ -70,7 +71,7 @@ def fill_empty_adjectives(word, adj):
 
 
 def write_users_df_to_csv(words_df):
-    WORDS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned_onehot.csv')
+    WORDS_CLEANED_DATA_FILE_PATH = os.path.join(DATA_DIR_PATH, 'words_cleaned_binary.csv')
     words_df.to_csv(WORDS_CLEANED_DATA_FILE_PATH, sep=',', encoding='utf-8')
 
 
@@ -91,7 +92,7 @@ if __name__ == '__main__':
     words_df = clean_like_artist(words_df)
 
     print("Encoding non integer fields..")
-    words_df = words_df.apply(encode_word, axis=1, args=(False,))
+    words_df = words_df.apply(encode_word, axis=1, args=(True,))
 
     adjectives = [
         'Uninspired',
