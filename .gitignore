@@ -93,4 +93,3 @@ ENV/
 data_parser/mysql_config.json
 edwin/rf_full/models
 edwin/rf_by_artist/models
-edwin/lr_by_artist/models
