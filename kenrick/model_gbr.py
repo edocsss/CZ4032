@@ -53,14 +53,24 @@ X_test, y_test = get_full_data(X_test_dirty, y_test_dirty)
 # Now this~
 params = {'n_estimators': 500, 'max_depth': 5, 'min_samples_split': 1,
           'learning_rate': 0.5, 'loss': 'ls'}
-clf = ensemble.GradientBoostingRegressor(**params)
-model = clf.fit(X_train, y_train)
+# clf = ensemble.GradientBoostingRegressor(**params)
+# model = clf.fit(X_train, y_train)
 
 # Who likes pickle?
-f = open('gbr_ne500_maxdepth5_minsamplessplit1_lr0.5_lossls2.pkl', 'wb')
-pickle.dump(model, f, protocol=pickle.HIGHEST_PROTOCOL)
+# f = open('gbr_ne500_maxdepth5_minsamplessplit1_lr0.5_lossls.pkl', 'wb')
+# pickle.dump(model, f, protocol=pickle.HIGHEST_PROTOCOL)
+f = open('gbr_ne500_maxdepth5_minsamplessplit1_lr0.5_lossls.pkl', 'rb')
+model = pickle.load(f)
 f.close()
 
+preds = model.predict(X_train)
+res = []
+for i in range(len(preds)):
+    res.append((preds[i], y_train[i]))
+
+fp = open('gbr_preds.pkl', 'wb')
+pickle.dump(res, fp, protocol=pickle.HIGHEST_PROTOCOL)
+fp.close()
 
 # Check loss
 train_error = mean_squared_error(y_train, model.predict(X_train))
