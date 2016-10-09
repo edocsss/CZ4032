@@ -9,7 +9,7 @@ from edwin.util import data_util
 
 def read_data_set():
     data_split = data_split_util.read_data_split()
-    return data_split['X_train'], data_split['y_train'], data_split['X_test'], data_split['y_test']
+    return data_split['X_A'], data_split['Y_A'], data_split['X_B'], data_split['Y_B'], data_split['X_AB'], data_split['Y_AB']
 
 
 def predict_rating_by_artist(x, artist_id):
@@ -40,7 +40,9 @@ def predict_ratings_and_calculate_mse(X, Y):
         x = group[2].values
         y = group[1].values
 
-        predictions.append((y, predict_rating_by_artist(x, artist_id)))
+        prediction_result = predict_rating_by_artist(x, artist_id)
+        for i in range(len(prediction_result)):
+            predictions.append((prediction_result[i], y[i]))
 
     calculate_mse_from_predictions(predictions)
     return predictions
@@ -66,30 +68,22 @@ def group_data_by_artist(X, Y):
 
 def calculate_mse_from_predictions(prediction_result):
     diff_total = 0
-    total_data = 0
-
     for i in range(len(prediction_result)):
         y_true = prediction_result[i][0]
         y_pred = prediction_result[i][1]
-        total_data += len(y_true)
 
-        for j in range(len(y_true)):
-            diff_total += math.pow(y_true[j] - y_pred[j], 2)
-            print('Predicted value: {}, Actual value: {}'.format(y_pred[j], y_true[j]))
+        diff_total += math.pow(y_true - y_pred, 2)
+        print('Predicted value: {}, Actual value: {}'.format(y_pred, y_true))
 
-    mse = diff_total / total_data
+    mse = diff_total / len(prediction_result)
     print('MSE: {}, RMSE: {}'.format(mse, math.sqrt(mse)))
 
 
 if __name__ == '__main__':
-    X_train, Y_train, X_test, Y_test = read_data_set()
-    predictions = predict_ratings_and_calculate_mse(X_test, Y_test)
+    X_A, Y_A, X_B, Y_B, X_AB, Y_AB = read_data_set()
+    # predictions = predict_ratings_and_calculate_mse(X_B, Y_B)
 
-    # training_predictions = predict_ratings_and_calculate_mse(X_train, Y_train)
-    # result = []
-    # for i in range(len(training_predictions)):
-    #     result.append((training_predictions[i], Y_train[i]))
-    #
-    # f = gzip.GzipFile('rf_by_artist_training_predictions_result.zip', 'wb')
-    # pickle.dump(result, f)
-    # f.close()
+    AB_predictions = predict_ratings_and_calculate_mse(X_AB, Y_AB)
+    f = gzip.GzipFile('rf_by_artist_training_predictions_result.zip', 'wb')
+    pickle.dump(AB_predictions, f)
+    f.close()

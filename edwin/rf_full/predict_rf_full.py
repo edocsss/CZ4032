@@ -9,7 +9,7 @@ from edwin.util import data_util
 
 def read_data_set():
     data_split = data_split_util.read_data_split()
-    return data_split['X_train'], data_split['y_train'], data_split['X_test'], data_split['y_test']
+    return data_split['X_A'], data_split['Y_A'], data_split['X_B'], data_split['Y_B'], data_split['X_AB'], data_split['Y_AB']
 
 
 def build_df_from_test_input(test_input):
@@ -18,7 +18,7 @@ def build_df_from_test_input(test_input):
 
 
 def predict_rating(X):
-    file_path = os.path.join('models', 'rf_full_model_ignored.p')
+    file_path = os.path.join('models', 'rf_full_model.p')
     f = open(file_path, 'rb')
     model = pickle.load(f)
     f.close()
@@ -49,13 +49,13 @@ def calculate_mse_from_predictions(predictions, Y_true):
 
 
 if __name__ == '__main__':
-    X_train, Y_train, X_test, Y_test = read_data_set()
-    predictions = predict_rf_full(X_test, Y_test)
+    X_A, Y_A, X_B, Y_B, X_AB, Y_AB = read_data_set()
+    predictions = predict_rf_full(X_B, Y_B)
 
-    # training_predictions = predict_rf_full(X_train, Y_train)
+    # training_predictions = predict_rf_full(X_AB, Y_AB)
     # result = []
     # for i in range(len(training_predictions)):
-    #     result.append((training_predictions[i], Y_train[i]))
+    #     result.append((training_predictions[i], Y_AB[i]))
     #
     # f = gzip.GzipFile('rf_full_training_predictions_result.zip', 'wb')
     # pickle.dump(result, f)

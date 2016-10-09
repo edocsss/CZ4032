@@ -63,8 +63,8 @@ def combine_testing_data(test_split_df, training_mean_std_per_column):
 
 def get_train_data_split_df():
     data_split = data_split_util.read_data_split()
-    X_train_data_split = data_split['X_train']
-    Y_train_data_split = data_split['y_train']
+    X_train_data_split = data_split['X_A']
+    Y_train_data_split = data_split['Y_A']
 
     X_train_data_split_df = pd.DataFrame(data=X_train_data_split, columns=['Artist', 'Track', 'User', 'Time'])
     Y_train_data_split_df = pd.DataFrame(data=Y_train_data_split, columns=['Rating'])

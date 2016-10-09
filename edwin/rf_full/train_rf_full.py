@@ -19,7 +19,7 @@ def cv_rf(X, Y, n=100):
 
 
 def store_rf_model(rf_model):
-    file_path = os.path.join('models', 'rf_full_model_ignored.p')
+    file_path = os.path.join('models', 'rf_full_model.p')
     f = open(file_path, 'wb')
     pickle.dump(rf_model, f)
     f.close()
