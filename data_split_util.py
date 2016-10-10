@@ -24,7 +24,7 @@ def build_data_split():
     Y_matrix = train_df['Rating'].values.astype(float)
 
     X_A, X_B, Y_A, Y_B = train_test_split(X_matrix, Y_matrix, train_size=0.6)
-    X_B, X_C, Y_B, Y_C = train_test_split(X_B, Y_B, train_size=0.2)
+    X_B, X_C, Y_B, Y_C = train_test_split(X_B, Y_B, train_size=0.5)
 
     X_AB = np.concatenate([X_A, X_B])
     Y_AB = np.concatenate([Y_A, Y_B])
@@ -49,5 +49,5 @@ def build_data_split():
 
 
 if __name__ == '__main__':
-    # build_data_split()
-    read_data_split()
+    build_data_split()
+    data = read_data_split()

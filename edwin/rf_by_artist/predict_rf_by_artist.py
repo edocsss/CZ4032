@@ -81,7 +81,7 @@ def calculate_mse_from_predictions(prediction_result):
 
 if __name__ == '__main__':
     X_A, Y_A, X_B, Y_B, X_AB, Y_AB = read_data_set()
-    # predictions = predict_ratings_and_calculate_mse(X_B, Y_B)
+    predictions = predict_ratings_and_calculate_mse(X_B, Y_B)
 
     AB_predictions = predict_ratings_and_calculate_mse(X_AB, Y_AB)
     f = gzip.GzipFile('rf_by_artist_training_predictions_result.zip', 'wb')
