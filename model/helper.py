@@ -1,21 +1,36 @@
 import os
 import sys
 import math
-import pandas
+import pickle
 import numpy as np
+import pandas as pd
 
-def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
+# 132083
+# 56607
+def l():
+    p='../data_split.pkl'
+    with open(p, 'rb') as f:
+        d=pickle.load(f)
+    def m():
+        t=np.append(d['X_AB'],d['Y_AB'][:,None],axis=1)
+        return t
+    tt=pd.DataFrame(m(),
+        columns=('Artist','Track','User','Time','Rating'),
+        )
+    return tt
+
+def load_dataset(val_ratio=.30, shuffle=False, suffix='onehot', debug=False):
     users_table_path = os.path.join(os.getcwd(), '../data/users_cleaned_%s.csv' % suffix)
     words_table_path = os.path.join(os.getcwd(), '../data/words_cleaned_%s.csv' % suffix)
-    train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
+    # train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
     test_table_path = os.path.join(os.getcwd(), '../data/test.csv')
-    users_table = pandas.read_csv(users_table_path)
-    words_table = pandas.read_csv(words_table_path)
-    train_table = pandas.read_csv(train_table_path)
-    test_table = pandas.read_csv(test_table_path)
-    users_words_innerjoin = pandas.merge(words_table, users_table, how='inner', left_on='User', right_on='RESPID')
-    all_table_innerjoin = pandas.merge(train_table, users_words_innerjoin, how='inner', on=('User', 'Artist'))
-    test_table_innerjoin = pandas.merge(test_table, users_words_innerjoin, how='left', on=('User', 'Artist'))
+    users_table = pd.read_csv(users_table_path)
+    words_table = pd.read_csv(words_table_path)
+    train_table = l()
+    test_table = pd.read_csv(test_table_path)
+    users_words_innerjoin = pd.merge(words_table, users_table, how='inner', left_on='User', right_on='RESPID')
+    all_table_innerjoin = pd.merge(train_table, users_words_innerjoin, how='inner', on=('User', 'Artist'))
+    test_table_innerjoin = pd.merge(test_table, users_words_innerjoin, how='left', on=('User', 'Artist'))
     # sapu bersih
     all_table_innerjoin.drop(
         axis=1,
@@ -83,6 +98,8 @@ def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
     for col in range(1, 82):
         replacement = test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]!=2.,col].mean()
         test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]==2.,col] = replacement
+    if debug:
+        return all_table_innerjoin, test_table_innerjoin
     dataset = all_table_innerjoin.as_matrix().astype(float)
     dataset_size = dataset.shape[0]
     if shuffle:
