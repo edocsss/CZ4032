@@ -117,6 +117,7 @@ train_size=X_train.shape[0]
 shuffled_idx = np.arange(train_size)
 np.random.shuffle(shuffled_idx)
 X_train = X_train[shuffled_idx]
+y_train = y_train[shuffled_idx]
 
 input_size = X_train.shape[1]
 output_size = 1
