@@ -2,10 +2,9 @@ import os
 import sys
 import time
 import math
-import pickle
 import random
+import pandas
 import numpy as np
-import pandas as pd
 from getopt import getopt
 
 import theano
@@ -18,32 +17,18 @@ from lasagne.objectives import *
 from lasagne.nonlinearities import *
 from lasagne.regularization import *
 
-# 132083
-# 56607
-def l():
-    p='../data_split.pkl'
-    with open(p, 'rb') as f:
-        d=pickle.load(f)
-    def m():
-        t=np.append(d['X_AB'],d['Y_AB'][:,None],axis=1)
-        return t
-    tt=pd.DataFrame(m(),
-        columns=('Artist','Track','User','Time','Rating'),
-        )
-    return tt
-
 def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
     users_table_path = os.path.join(os.getcwd(), '../data/users_cleaned_%s.csv' % suffix)
     words_table_path = os.path.join(os.getcwd(), '../data/words_cleaned_%s.csv' % suffix)
-    # train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
+    train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
     test_table_path = os.path.join(os.getcwd(), '../data/test.csv')
-    users_table = pd.read_csv(users_table_path)
-    words_table = pd.read_csv(words_table_path)
-    train_table = l()
-    test_table = pd.read_csv(test_table_path)
-    users_words_innerjoin = pd.merge(words_table, users_table, how='inner', left_on='User', right_on='RESPID')
-    all_table_innerjoin = pd.merge(train_table, users_words_innerjoin, how='inner', on=('User', 'Artist'))
-    test_table_innerjoin = pd.merge(test_table, users_words_innerjoin, how='left', on=('User', 'Artist'))
+    users_table = pandas.read_csv(users_table_path)
+    words_table = pandas.read_csv(words_table_path)
+    train_table = pandas.read_csv(train_table_path)
+    test_table = pandas.read_csv(test_table_path)
+    users_words_innerjoin = pandas.merge(words_table, users_table, how='inner', left_on='User', right_on='RESPID')
+    all_table_innerjoin = pandas.merge(train_table, users_words_innerjoin, how='inner', on=('User', 'Artist'))
+    test_table_innerjoin = pandas.merge(test_table, users_words_innerjoin, how='left', on=('User', 'Artist'))
     # sapu bersih
     all_table_innerjoin.drop(
         axis=1,
@@ -129,16 +114,33 @@ def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
     return X_train, y_train, X_val, y_val, X_test
 
 if __name__ == '__main__':
-    hidden_size = 40
-    Alpha = 1e-3 # Learning rate
-    Beta = 0. # L2 Reg
+    # random.seed(42)
+    # np.random.seed(42)
+    hidden_size = 20
+    Alpha = 3e-3 # Learning rate
+    Beta = 1e-6 # L2 Reg
     max_iter = 1000
-    max_tol = 10
+    max_tol = 25
     suffix = 'onehot'
     print('Import done! Parsing parameters...')
+    args = sys.argv[1:]
+    opts, args = getopt(args, '', ['max-iter=', 'Alpha=', 'Beta=', 'suffix=', 'hidden-size=', 'max-tol='])
+    for option, value in opts:
+        if option == '--max-iter':
+            max_iter = int(value)
+        elif option == '--Alpha':
+            Alpha = float(value)
+        elif option == '--Beta':
+            Beta = float(value)
+        elif option == '--suffix':
+            suffix = value
+        elif option == '--hidden-size':
+            hidden_size = int(value)
+        elif option == '--max-tol':
+            max_tol = int(value)
 
     print('Parsing done! Loading dataset...')
-    X_train, y_train, X_val, y_val, X_test = load_dataset(val_ratio=0.3,suffix=suffix,shuffle=False)
+    X_train, y_train, X_val, y_val, X_test = load_dataset(suffix=suffix)
     train_size = X_train.shape[0]
     val_size = X_val.shape[0]
     X_mean = X_train.mean(axis=0)
@@ -148,11 +150,10 @@ if __name__ == '__main__':
     X_test = (X_test - X_mean) / X_std
 
     print('Dataset loaded! Creating ANN...')
-    input_size = X_train.shape[1]
-    output_size = 1
     input_var = T.matrix('inputs')
     target_var = T.col('targets')
-
+    input_size = X_train.shape[1]
+    output_size = 1
     input_layer = InputLayer(
         shape=(None, input_size),
         input_var=input_var,
@@ -164,6 +165,9 @@ if __name__ == '__main__':
         nonlinearity=linear,
         W=Uniform(-0.05),
         b=Uniform(-0.05),
+        # nonlinearity=rectify,
+        # W=Constant(1.),
+        # b=Constant(1.),
         name='hidden layer'
         )
     output_layer = DenseLayer(
@@ -172,6 +176,9 @@ if __name__ == '__main__':
         nonlinearity=linear,
         W=Uniform(-0.05),
         b=Uniform(-0.05),
+        # nonlinearity=rectify,
+        # W=Constant(1.),
+        # b=Constant(1.),
         name='output layer'
         )
     neural_network = output_layer
@@ -213,6 +220,3 @@ if __name__ == '__main__':
     print('Training loss: %.9f, val loss: %.9f, best val err: %.9f' % (train_err, val_err, best_val_err))
 
     result = predict_fn(X_test)
-
-    with open('nn_params.pkl', 'wb') as f:
-        pickle.dump(best_params, f)

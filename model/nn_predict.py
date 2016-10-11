@@ -4,6 +4,7 @@ import time
 import math
 import pickle
 import random
+import pickle
 import numpy as np
 import pandas as pd
 from getopt import getopt
@@ -128,17 +129,10 @@ def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
     X_test = test_table_innerjoin.as_matrix().astype(float)
     return X_train, y_train, X_val, y_val, X_test
 
-if __name__ == '__main__':
-    hidden_size = 40
-    Alpha = 1e-3 # Learning rate
-    Beta = 0. # L2 Reg
-    max_iter = 1000
-    max_tol = 10
-    suffix = 'onehot'
-    print('Import done! Parsing parameters...')
-
-    print('Parsing done! Loading dataset...')
-    X_train, y_train, X_val, y_val, X_test = load_dataset(val_ratio=0.3,suffix=suffix,shuffle=False)
+if '__main__' == __name__:
+    hidden_size=40
+    print('Import done! Loading dataset...')
+    X_train, y_train, X_val, y_val, X_test = load_dataset(val_ratio=0.,suffix='onehot',shuffle=False)
     train_size = X_train.shape[0]
     val_size = X_val.shape[0]
     X_mean = X_train.mean(axis=0)
@@ -175,44 +169,13 @@ if __name__ == '__main__':
         name='output layer'
         )
     neural_network = output_layer
-
-    # For training
-    parameters = get_all_params(neural_network, trainable=True)
     prediction = get_output(neural_network)
-    mse = squared_error(prediction, target_var).mean()
-    # mcc = binary_crossentropy(prediction, target_var).mean()
-    reg = Beta * regularize_layer_params(neural_network, l2)
-    loss = mse + reg
-    # loss = mcc + reg
-    updates = sgd(loss, parameters, learning_rate=Alpha)
-    train_fn = theano.function([input_var, target_var], loss, updates=updates)
-    # For CV and testing
-    test_fn = theano.function([input_var, target_var], loss)
     predict_fn = theano.function([input_var], prediction)
-    print('ANN created! Initiate training...')
 
-    n_tol = 0
-    best_val_err = test_fn(X_val, y_val) # Capture best cv err
-    best_params = get_all_param_values(neural_network) # and best params
-    print('Training start...')
-    training_start_time = time.time()
-    for it in range(max_iter):
-        train_err = train_fn(X_train, y_train)
-        val_err = test_fn(X_val, y_val)
-        # print(train_err, val_err)
-        if val_err < best_val_err:
-            best_val_err = val_err
-            best_params = get_all_param_values(neural_network)
-            n_tol = 0
-        else:
-            n_tol = n_tol + 1
-        if n_tol == max_tol:
-            print('>>> Validation err is no longer improving')
-            break
-    print('Training duration: %.4f (%d epoch out of %d)' % (time.time() - training_start_time, it + 1, max_iter))
-    print('Training loss: %.9f, val loss: %.9f, best val err: %.9f' % (train_err, val_err, best_val_err))
+    with open('nn_params.pkl', 'rb') as f:
+        params=pickle.load(f)
 
-    result = predict_fn(X_test)
-
-    with open('nn_params.pkl', 'wb') as f:
-        pickle.dump(best_params, f)
+    set_all_param_values(neural_network, params)
+    y_hat=predict_fn(X_train)
+    with open('nn_predicts.pkl', 'wb') as f:
+        pickle.dump(np.append(y_hat, y_train[:,None], axis=1), f)
