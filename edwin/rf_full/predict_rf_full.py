@@ -52,11 +52,11 @@ if __name__ == '__main__':
     X_A, Y_A, X_B, Y_B, X_AB, Y_AB = read_data_set()
     predictions = predict_rf_full(X_B, Y_B)
 
-    # training_predictions = predict_rf_full(X_AB, Y_AB)
-    # result = []
-    # for i in range(len(training_predictions)):
-    #     result.append((training_predictions[i], Y_AB[i]))
-    #
-    # f = gzip.GzipFile('rf_full_training_predictions_result.zip', 'wb')
-    # pickle.dump(result, f)
-    # f.close()
+    training_predictions = predict_rf_full(X_AB, Y_AB)
+    result = []
+    for i in range(len(training_predictions)):
+        result.append((training_predictions[i], Y_AB[i]))
+
+    f = gzip.GzipFile('rf_full_training_predictions_result.zip', 'wb')
+    pickle.dump(result, f)
+    f.close()
