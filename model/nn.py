@@ -7,6 +7,7 @@ import random
 import numpy as np
 import pandas as pd
 from getopt import getopt
+from helper import *
 
 import theano
 import theano.tensor as T
@@ -20,113 +21,114 @@ from lasagne.regularization import *
 
 # 132083
 # 56607
-def l():
-    p='../data_split.pkl'
-    with open(p, 'rb') as f:
-        d=pickle.load(f)
-    def m():
-        t=np.append(d['X_AB'],d['Y_AB'][:,None],axis=1)
-        return t
-    tt=pd.DataFrame(m(),
-        columns=('Artist','Track','User','Time','Rating'),
-        )
-    return tt
+# def l(suffix='A'):
+#     p='../data_split.pkl'
+#     with open(p, 'rb') as f:
+#         d=pickle.load(f)
+#     def m():
+#         t=np.append(d['X_%s'%suffix],d['Y_%s'%suffix][:,None],axis=1)
+#         return t
+#     tt=pd.DataFrame(m(),
+#         columns=('Artist','Track','User','Time','Rating'),
+#         )
+#     return tt
 
-def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
-    users_table_path = os.path.join(os.getcwd(), '../data/users_cleaned_%s.csv' % suffix)
-    words_table_path = os.path.join(os.getcwd(), '../data/words_cleaned_%s.csv' % suffix)
-    # train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
-    test_table_path = os.path.join(os.getcwd(), '../data/test.csv')
-    users_table = pd.read_csv(users_table_path)
-    words_table = pd.read_csv(words_table_path)
-    train_table = l()
-    test_table = pd.read_csv(test_table_path)
-    users_words_innerjoin = pd.merge(words_table, users_table, how='inner', left_on='User', right_on='RESPID')
-    all_table_innerjoin = pd.merge(train_table, users_words_innerjoin, how='inner', on=('User', 'Artist'))
-    test_table_innerjoin = pd.merge(test_table, users_words_innerjoin, how='left', on=('User', 'Artist'))
-    # sapu bersih
-    all_table_innerjoin.drop(
-        axis=1,
-        inplace=True,
-        labels=[
-            'Artist',
-            'Track',
-            'User',
-            'Time',
-            'Unnamed: 0_x',
-            'Unnamed: 0_y',
-            'HEARD_OF',
-            'OWN_ARTIST_MUSIC',
-            'RESPID',
-            'GENDER',
-            'AGE',
-            'WORKING',
-            'REGION',
-            'MUSIC',
-            ],
-        )
-    test_table_innerjoin.drop(
-        axis=1,
-        inplace=True,
-        labels=[
-            # 'Artist',
-            # 'Track',
-            # 'User',
-            # 'Time',
-            'Unnamed: 0_x',
-            'Unnamed: 0_y',
-            'HEARD_OF',
-            'OWN_ARTIST_MUSIC',
-            'RESPID',
-            'GENDER',
-            'AGE',
-            'WORKING',
-            'REGION',
-            'MUSIC',
-            ],
-        )
-    # sweeping
-    for col in range(2, 83):
-        replacement = all_table_innerjoin.ix[all_table_innerjoin.ix[:,col]!=2.,col].mean()
-        all_table_innerjoin.ix[all_table_innerjoin.ix[:,col]==2.,col] = replacement
-    # sweeping testset
-    for col in range(4, test_table_innerjoin.shape[1]):
-        sel = test_table_innerjoin.ix[:,col].isnull()
-        if 5 <= col < 86:
-            test_table_innerjoin.ix[sel,col] = 2.
-            replacement = test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]!=2.,col].mean()
-            test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]==2.,col] = replacement
-        else:
-            test_table_innerjoin.ix[sel,col] = test_table_innerjoin.ix[~sel,col].mean()
-    test_table_innerjoin.drop(
-        axis=1,
-        inplace=True,
-        labels=[
-            'Artist',
-            'Track',
-            'User',
-            'Time',
-            ],
-        )
-    for col in range(1, 82):
-        replacement = test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]!=2.,col].mean()
-        test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]==2.,col] = replacement
-    dataset = all_table_innerjoin.as_matrix().astype(float)
-    dataset_size = dataset.shape[0]
-    if shuffle:
-        shuffledidx = np.arange(dataset_size)
-        np.random.shuffle(shuffledidx)
-        dataset = dataset[shuffledidx, :]
-    train_ratio = 1. - val_ratio
-    assert train_ratio > 0., "wtf?"
-    train_size = int(math.ceil(train_ratio * dataset_size))
-    val_size = dataset_size - train_size
-    X_train = dataset[:train_size, 1:]
-    y_train = dataset[:train_size, [0]]
-    X_val = dataset[train_size:, 1:]
-    y_val = dataset[train_size:, [0]]
-    X_test = test_table_innerjoin.as_matrix().astype(float)
-    return X_train, y_train, X_val, y_val, X_test
+# def load_dataset(val_ratio=.20, shuffle=True, suffix='onehot'):
+#     users_table_path = os.path.join(os.getcwd(), '../data/users_cleaned_%s.csv' % suffix)
+#     words_table_path = os.path.join(os.getcwd(), '../data/words_cleaned_%s.csv' % suffix)
+#     # train_table_path = os.path.join(os.getcwd(), '../data/train.csv')
+# #    test_table_path = os.path.join(os.getcwd(), '../data/test.csv')
+#     users_table = pd.read_csv(users_table_path)
+#     words_table = pd.read_csv(words_table_path)
+#     train_table = l()
+# #    test_table = pd.read_csv(test_table_path)
+#     users_words_innerjoin = pd.merge(words_table, users_table, how='inner', left_on='User', right_on='RESPID')
+#     all_table_innerjoin = pd.merge(train_table, users_words_innerjoin, how='inner', on=('User', 'Artist'))
+# #    test_table_innerjoin = pd.merge(test_table, users_words_innerjoin, how='left', on=('User', 'Artist'))
+#     # sapu bersih
+#     all_table_innerjoin.drop(
+#         axis=1,
+#         inplace=True,
+#         labels=[
+#             'Artist',
+#             'Track',
+#             'User',
+#             'Time',
+#             'Unnamed: 0_x',
+#             'Unnamed: 0_y',
+#             'HEARD_OF',
+#             'OWN_ARTIST_MUSIC',
+#             'RESPID',
+#             'GENDER',
+#             'AGE',
+#             'WORKING',
+#             'REGION',
+#             'MUSIC',
+#             ],
+#         )
+# #    test_table_innerjoin.drop(
+#         # axis=1,
+#         # inplace=True,
+#         # labels=[
+#         #     # 'Artist',
+#         #     # 'Track',
+#         #     # 'User',
+#         #     # 'Time',
+#         #     'Unnamed: 0_x',
+#         #     'Unnamed: 0_y',
+#         #     'HEARD_OF',
+#         #     'OWN_ARTIST_MUSIC',
+#         #     'RESPID',
+#         #     'GENDER',
+#         #     'AGE',
+#         #     'WORKING',
+#         #     'REGION',
+#         #     'MUSIC',
+#         #     ],
+#         # )
+#     # sweeping
+#     for col in range(2, 83):
+#         replacement = all_table_innerjoin.ix[all_table_innerjoin.ix[:,col]!=2.,col].mean()
+#         all_table_innerjoin.ix[all_table_innerjoin.ix[:,col]==2.,col] = replacement
+#     # sweeping testset
+# #    for col in range(4, test_table_innerjoin.shape[1]):
+# #        sel = test_table_innerjoin.ix[:,col].isnull()
+#         # if 5 <= col < 86:
+# #            test_table_innerjoin.ix[sel,col] = 2.
+# #            replacement = test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]!=2.,col].mean()
+# #            test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]==2.,col] = replacement
+#         # else:
+# #            test_table_innerjoin.ix[sel,col] = test_table_innerjoin.ix[~sel,col].mean()
+# #    test_table_innerjoin.drop(
+#         # axis=1,
+#         # inplace=True,
+#         # labels=[
+#         #     'Artist',
+#         #     'Track',
+#         #     'User',
+#         #     'Time',
+#         #     ],
+#         # )
+#     # for col in range(1, 82):
+#     #     replacement = test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]!=2.,col].mean()
+#     #     test_table_innerjoin.ix[test_table_innerjoin.ix[:,col]==2.,col] = replacement
+#     dataset = all_table_innerjoin.as_matrix().astype(float)
+#     dataset_size = dataset.shape[0]
+#     if shuffle:
+#         shuffledidx = np.arange(dataset_size)
+#         np.random.shuffle(shuffledidx)
+#         dataset = dataset[shuffledidx, :]
+#     train_ratio = 1. - val_ratio
+#     assert train_ratio > 0., "wtf?"
+#     train_size = int(math.ceil(train_ratio * dataset_size))
+#     val_size = dataset_size - train_size
+#     X_train = dataset[:train_size, 1:]
+#     y_train = dataset[:train_size, [0]]
+#     X_val = dataset[train_size:, 1:]
+#     y_val = dataset[train_size:, [0]]
+#     # X_test = test_table_innerjoin.as_matrix().astype(float)
+#     # return X_train, y_train, X_val, y_val, X_test
+#     return X_train, y_train, X_val, y_val, None
 
 if __name__ == '__main__':
     hidden_size = 40
@@ -145,7 +147,7 @@ if __name__ == '__main__':
     X_std = X_train.std(axis=0)
     X_train = (X_train - X_mean) / X_std
     X_val = (X_val - X_mean) / X_std
-    X_test = (X_test - X_mean) / X_std
+    # X_test = (X_test - X_mean) / X_std
 
     print('Dataset loaded! Creating ANN...')
     input_size = X_train.shape[1]
@@ -212,7 +214,12 @@ if __name__ == '__main__':
     print('Training duration: %.4f (%d epoch out of %d)' % (time.time() - training_start_time, it + 1, max_iter))
     print('Training loss: %.9f, val loss: %.9f, best val err: %.9f' % (train_err, val_err, best_val_err))
 
-    result = predict_fn(X_test)
+    # result = predict_fn(X_test)
 
     with open('nn_params.pkl', 'wb') as f:
         pickle.dump(best_params, f)
+
+    X_B, y_B = wrapper(suffix='B')
+    y_B_hat = predict_fn(X_B)
+    with open('nn_y_B_hat.pkl', 'wb') as f:
+        pickle.dump(np.append(y_B_hat[:,None], y_B[:,None], axis=1), f)

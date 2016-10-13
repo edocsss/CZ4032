@@ -35,18 +35,18 @@ def gbr():
         y=np.array(pickle.load(f))
     return y
 def nn():
-    filename='../model/nn_predicts.pkl'
+    filename='../model/nn_y_B_hat.pkl'
     with open(filename, 'rb') as f:
         y=pickle.load(f)
     y=y[:,] # swap
     return y
 def rf1():
-    filename='../model/rf1_predicts.pkl'
+    filename='../model/rf1_y_B_hat.pkl'
     with open(filename, 'rb') as f:
         y=pickle.load(f)
     return y
 def rf2():
-    filename='../model/rf2_predicts.pkl'
+    filename='../model/rf2_y_B_hat.pkl'
     with open(filename, 'rb') as f:
         y=pickle.load(f)
     return y
@@ -133,7 +133,7 @@ X_train = (X_train - X_mean) / X_std
 X_val = (X_val - X_mean) / X_std
 
 hidden_size = 20
-Alpha = 1e-3 # Learning rate
+Alpha = 3e-3 # Learning rate
 Beta = 0. # L2 Reg
 max_iter = 1000
 max_tol = 10

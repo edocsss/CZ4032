@@ -6,7 +6,7 @@ import random
 import pickle
 import numpy as np
 import pandas as pd
-from helper import load_dataset
+from helper import *
 from sklearn.ensemble import RandomForestRegressor as RFG
 
 def split(d, val_ratio=.3, shuffle=True):
@@ -27,7 +27,7 @@ def split(d, val_ratio=.3, shuffle=True):
 
 if __name__ == '__main__':
     # RF by User Qs [A, Tr, U, Q] [Peter]
-    d, t = load_dataset(debug=True)
+    d, t = load_dataset(debug=True, suffix='onehot', suffix2='A')
     col_filters = ['LIKE_ARTIST', 'Uninspired', 'Sophisticated', 'Aggressive',
         'Edgy', 'Sociable', 'Laid back', 'Wholesome', 'Uplifting', 'Intriguing',
         'Legendary', 'Free', 'Thoughtful', 'Outspoken', 'Serious',
@@ -49,7 +49,7 @@ if __name__ == '__main__':
         'LIST_OWN', 'LIST_BACK', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7',
         'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15', 'Q16', 'Q17', 'Q18']
     train_df = d.loc[:, ['Rating'] + col_filters]
-    test_df = t.loc[:, col_filters]
+    # test_df = t.loc[:, col_filters]
     dataset = train_df.as_matrix().astype(float)
     X_train, y_train, X_val, y_val = split(dataset, val_ratio=0., shuffle=False)
     # For fitting into RF
@@ -57,12 +57,12 @@ if __name__ == '__main__':
     y_val = y_val.flatten()
     train_size = X_train.shape[0]
     val_size = X_val.shape[0]
-    X_test = test_df.as_matrix().astype(float)
+    # X_test = test_df.as_matrix().astype(float)
 
     print('Saving RAM')
     # For the love of my laptop, please save the RAM
     del train_df
-    del test_df
+    # del test_df
     print('RAM saved!')
 
     print('Dataset loaded! Training with RFG...')
@@ -71,6 +71,11 @@ if __name__ == '__main__':
     with open('rf1.pkl', 'wb') as f:
         pickle.dump(rf,f)
     print('Training done!')
-    y_hat=rf.predict(X_train)
-    with open('rf1_predicts.pkl', 'wb') as f:
-        pickle.dump(np.append(y_hat[:,None], y_train[:,None], axis=1), f)
+    # y_hat=rf.predict(X_train)
+    # with open('rf1_predicts.pkl', 'wb') as f:
+    #     pickle.dump(np.append(y_hat[:,None], y_train[:,None], axis=1), f)
+
+    X_B, y_B = wrapper(suffix='B', filters=col_filters)
+    y_B_hat = rf.predict(X_B)
+    with open('rf1_y_B_hat.pkl', 'wb') as f:
+        pickle.dump(np.append(y_B_hat[:,None], y_B, axis=1), f)

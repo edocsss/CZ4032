@@ -37,7 +37,7 @@ if __name__ == '__main__':
         'AGE_RANGE_16-25', 'AGE_RANGE_26-35', 'AGE_RANGE_36-45',
         'AGE_RANGE_46-55', 'AGE_RANGE_56-65', 'AGE_RANGE_66-']
     train_df = d.loc[:, ['Rating'] + col_filters]
-    test_df = t.loc[:, col_filters]
+    # test_df = t.loc[:, col_filters]
     dataset = train_df.as_matrix().astype(float)
     X_train, y_train, X_val, y_val = split(dataset, val_ratio=0., shuffle=False)
     # For fitting into RF
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     y_val = y_val.flatten()
     train_size = X_train.shape[0]
     val_size = X_val.shape[0]
-    X_test = test_df.as_matrix().astype(float)
+    # X_test = test_df.as_matrix().astype(float)
 
     print('Saving RAM')
     # For the love of my laptop, please save the RAM
@@ -59,6 +59,11 @@ if __name__ == '__main__':
     with open('rf2.pkl', 'wb') as f:
         pickle.dump(rf,f)
     print('Training done!')
-    y_hat=rf.predict(X_train)
-    with open('rf2_predicts.pkl', 'wb') as f:
-        pickle.dump(np.append(y_hat[:,None], y_train[:,None], axis=1), f)
+    # y_hat=rf.predict(X_train)
+    # with open('rf2_predicts.pkl', 'wb') as f:
+    #     pickle.dump(np.append(y_hat[:,None], y_train[:,None], axis=1), f)
+
+    X_B, y_B = wrapper(suffix='B', filters=col_filters)
+    y_B_hat = rf.predict(X_B)
+    with open('rf2_y_B_hat.pkl', 'wb') as f:
+        pickle.dump(np.append(y_B_hat[:,None], y_B, axis=1), f)
