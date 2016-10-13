@@ -27,7 +27,7 @@ def split(d, val_ratio=.3, shuffle=True):
 
 if __name__ == '__main__':
     # RF by User demographics (non-Q) [A, Tr, U, Demo] [Peter]
-    d, t = load_dataset(debug=True)
+    d, t = load_dataset(debug=True, suffix='onehot', suffix2='A')
     col_filters = ['GENDER_0', 'GENDER_1', 'WORKING_0',
         'WORKING_1', 'WORKING_2', 'WORKING_3', 'WORKING_4', 'WORKING_5',
         'WORKING_6', 'WORKING_7', 'WORKING_8', 'WORKING_9', 'WORKING_10',
