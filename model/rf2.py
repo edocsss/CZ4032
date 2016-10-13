@@ -6,7 +6,7 @@ import random
 import pickle
 import numpy as np
 import pandas as pd
-from helper import load_dataset
+from helper import *
 from sklearn.ensemble import RandomForestRegressor as RFG
 
 def split(d, val_ratio=.3, shuffle=True):
