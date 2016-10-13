@@ -50,7 +50,7 @@ if __name__ == '__main__':
     print('Saving RAM')
     # For the love of my laptop, please save the RAM
     del train_df
-    del test_df
+    # del test_df
     print('RAM saved!')
 
     print('Dataset loaded! Training with RFG...')
