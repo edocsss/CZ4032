@@ -9,6 +9,7 @@ import pandas as pd
 from helper import *
 from sklearn.ensemble import RandomForestRegressor as RFG
 
+# Helper function
 def split(d, val_ratio=.3, shuffle=True):
     m = d.shape[0]
     if shuffle:
@@ -26,8 +27,10 @@ def split(d, val_ratio=.3, shuffle=True):
     return X_train, y_train, X_val, y_val
 
 if __name__ == '__main__':
-    # RF by User demographics (non-Q) [A, Tr, U, Demo] [Peter]
+    # RandomForest by User and their music habit
+    # Loading dataset
     d, t = load_dataset(debug=True, suffix='onehot', suffix2='A')
+    # Filters for obtaining only important columns/fields
     col_filters = ['GENDER_0', 'GENDER_1', 'WORKING_0',
         'WORKING_1', 'WORKING_2', 'WORKING_3', 'WORKING_4', 'WORKING_5',
         'WORKING_6', 'WORKING_7', 'WORKING_8', 'WORKING_9', 'WORKING_10',
@@ -53,9 +56,12 @@ if __name__ == '__main__':
     # del test_df
     print('RAM saved!')
 
+    # Preparing to train
     print('Dataset loaded! Training with RFG...')
     rf = RFG(n_estimators=38)
     rf.fit(X_train, y_train)
+
+    # Saving model to pickle file
     with open('rf2.pkl', 'wb') as f:
         pickle.dump(rf,f)
     print('Training done!')
@@ -63,6 +69,7 @@ if __name__ == '__main__':
     # with open('rf2_predicts.pkl', 'wb') as f:
     #     pickle.dump(np.append(y_hat[:,None], y_train[:,None], axis=1), f)
 
+    # Predicting
     X_B, y_B = wrapper(suffix='B', filters=col_filters)
     y_B_hat = rf.predict(X_B)
     with open('rf2_y_B_hat.pkl', 'wb') as f:
