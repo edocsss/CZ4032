@@ -12,9 +12,9 @@ Requirements:
 Training & Predicting:
 `python nn.py`
 
-+-----------------------------------------------------+
-| RandomForest by User and their music habit (rf1.py) |
-+-----------------------------------------------------+
++--------------------------------------------------------------------+
+| RandomForest by User and their music habit (rf_by_demographics.py) |
++--------------------------------------------------------------------+
 
 Requirements:
 - Python 3
@@ -23,11 +23,11 @@ Requirements:
 - Scikit-learn
 
 Training & Predicting:
-`python rf1.py`
+`python rf_by_demographics.py`
 
-+-----------------------------------------------------+
-| RandomForest by User and their music habit (rf2.py) |
-+-----------------------------------------------------+
++-----------------------------------------------------------------------+
+| RandomForest by User and their music habit (rf_by_questions_words.py) |
++-----------------------------------------------------------------------+
 
 Requirements:
 - Python 3
@@ -36,4 +36,4 @@ Requirements:
 - Scikit-learn
 
 Training & Predicting:
-`python rf2.py`
+`python rf_by_questions_words.py`

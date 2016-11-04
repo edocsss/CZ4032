@@ -4,6 +4,25 @@ import time
 from data_cleaner import encoding
 import encoding
 
+
+"""
+This script cleans the data found in Users.csv.
+There are a number of data cleaning procedures done here:
+1. Empty "WORKING" field --> fill in with "Not Available"
+2. Empty "AGE" field --> fill in with "-1"
+3. Empty "REGION" field --> fill in with "Not Available"
+4. For "LIST_OWN" and "LIST_BACK" field --> standardize the number of hours
+5. Empty question field --> fill in with the mean of that column
+
+There are some other optional pre-processing procedures in this script as well.
+For example, Neural Network works better with onehot encoding instead of binary representation of a numerical value.
+
+Thus, we have an option to either clean the Users.csv data using ONEHOT or BINARY encoding.
+For some models, like Random Forest, we found out that BINARY encoding seems to work better while Neural Network works
+better with ONEHOT encoding.
+"""
+
+
 DATA_DIR_PATH = '../data'
 
 def load_users_data():

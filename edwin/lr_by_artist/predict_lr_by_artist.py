@@ -4,12 +4,31 @@ import pickle
 import pandas as pd
 import data_split_util
 import gzip
+import pprint
 from edwin.util import data_util
+from sklearn.metrics import mean_squared_error
+
+
+"""
+Predict the rating for a given input using the Linear Regression model trained using
+<root_dir>/edwin/lr_by_artist/train_lr_by_artist.py.
+
+The data to be predicted needs to be pre-processed using the following procedures that we use for pre-processing the
+training data for building the Linear Regression. The pre-processing is done by the <root_dir>/edwin/util/data_util.py script.
+
+In addition, for each testing data, we need to know the Artist ID of that particular data. This is because we have one
+Linear Regression model for each Artist ID. Testing data with Artist ID = X will have its rating predicted by
+Linear Regression model(X).
+
+After predicting the rating for a set of testing data, the predictions are stored in a zipped pickle file.
+This is needed since we are going to use the predicted ratings to train the ensemble Neural Network or do the simple averaging
+ensemble method.
+"""
 
 
 def read_data_set():
     data_split = data_split_util.read_data_split()
-    return data_split['X_A'], data_split['Y_A'], data_split['X_B'], data_split['Y_B'], data_split['X_AB'], data_split['Y_AB']
+    return data_split['X_A'], data_split['Y_A'], data_split['X_B'], data_split['Y_B'], data_split['X_C'], data_split['Y_C']
 
 
 def predict_rating_by_artist(x, artist_id):
@@ -28,28 +47,33 @@ def predict_ratings_and_calculate_mse(X, Y):
     full_data = data_util.read_full_data_pickle()
     training_mean_std_per_column = full_data['training_mean_std_per_column']
 
-    X_test_df = build_df_from_test_input(X)
-    Y_test_df = pd.DataFrame(data=Y, columns=['Rating'])
-    preprocessed_X_test_df = data_util.combine_testing_data(X_test_df, training_mean_std_per_column)
+    test_df = build_df_from_test_input(X, Y)
+    preprocessed_test_df = data_util.combine_testing_data(test_df, training_mean_std_per_column)
 
     predictions = []
-    grouped_df = group_data_by_artist(preprocessed_X_test_df, Y_test_df)
+    grouped_df = group_data_by_artist(preprocessed_test_df.drop('Rating', axis=1), preprocessed_test_df['Rating'])
 
     for group in grouped_df:
         artist_id = group[0]
-        x = group[2].values
         y = group[1].values
+        x = group[2].values
+        indices = group[3].values
 
         prediction_result = predict_rating_by_artist(x, artist_id)
         for i in range(len(prediction_result)):
-            predictions.append((prediction_result[i], y[i]))
+            predictions.append((indices[i], prediction_result[i], y[i]))
+
+    predictions.sort(key=lambda item: item[0])
+    predictions = [(p[1], p[2]) for p in predictions]
 
     calculate_mse_from_predictions(predictions)
     return predictions
 
 
-def build_df_from_test_input(test_input):
-    test_df = pd.DataFrame(data=test_input, columns=['Artist', 'Track', 'User', 'Time'])
+def build_df_from_test_input(X, Y):
+    X_test_df = pd.DataFrame(data=X, columns=['Artist', 'Track', 'User', 'Time'])
+    Y_test_df = pd.DataFrame(data=Y, columns=['Rating'])
+    test_df = X_test_df.join(Y_test_df)
     return test_df
 
 
@@ -61,31 +85,27 @@ def group_data_by_artist(X, Y):
     for artist_id in ARTIST_ID:
         df_by_artist = df.loc[df['Artist'] == artist_id]
         if len(df_by_artist) > 0:
-            grouped_df_list.append((artist_id, df_by_artist['Rating'], df_by_artist.drop('Rating', axis=1)))
+            grouped_df_list.append((artist_id, df_by_artist['Rating'], df_by_artist.drop('Rating', axis=1), df_by_artist.index))
 
     return grouped_df_list
 
 
 def calculate_mse_from_predictions(prediction_result):
     diff_total = 0
-    total_data = 0
-
     for i in range(len(prediction_result)):
-        y_true = prediction_result[i][0]
-        y_pred = prediction_result[i][1]
-
+        y_true = prediction_result[i][1]
+        y_pred = prediction_result[i][0]
         diff_total += math.pow(y_true - y_pred, 2)
-        print('Predicted value: {}, Actual value: {}'.format(y_pred, y_true))
 
     mse = diff_total / len(prediction_result)
     print('MSE: {}, RMSE: {}'.format(mse, math.sqrt(mse)))
 
 
 if __name__ == '__main__':
-    X_A, Y_A, X_B, Y_B, X_AB, Y_AB = read_data_set()
-    predictions = predict_ratings_and_calculate_mse(X_B, Y_B)
+    # Change the dataset to be predicted accordingly
+    X_A, Y_A, X_B, Y_B, X_C, Y_C = read_data_set()
+    predictions = predict_ratings_and_calculate_mse(X_C, Y_C)
 
-    AB_predictions = predict_ratings_and_calculate_mse(X_AB, Y_AB)
-    f = gzip.GzipFile('lr_by_artist_training_predictions_result.zip', 'wb')
-    pickle.dump(AB_predictions, f)
+    f = gzip.GzipFile('lr_by_artist_training_predictions_result_C2.zip', 'wb')
+    pickle.dump(predictions, f)
     f.close()

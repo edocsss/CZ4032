@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.linear_model import Ridge, Lasso, LinearRegression
 from sklearn.cross_validation import cross_val_score
 from sklearn.metrics import mean_squared_error
+import math
+
 
 ROOT_PATH = os.path.join("..")
 TRAIN_DATA_PATH = os.path.join(ROOT_PATH, 'data_split.pkl')
@@ -18,11 +20,10 @@ def load_data():
 	X_A = data_from_pickle['X_A']
 	X_B = data_from_pickle['X_B']
 	X_C = data_from_pickle['X_C']
+	X_AB = data_from_pickle['X_AB']
 	Y_A = data_from_pickle['Y_A']
 	Y_B = data_from_pickle['Y_B']
 	Y_C = data_from_pickle['Y_C']
-	#Concatenated_data
-	X_AB = data_from_pickle['X_AB']
 	Y_AB = data_from_pickle['Y_AB']
 	f.close()
 	return X_A, Y_A, X_B, Y_B, X_C, Y_C, X_AB, Y_AB
@@ -36,9 +37,7 @@ def get_additional_features(x, y):
 	users = pd.read_csv(USERS_PATH)
 	words = pd.read_csv(WORDS_PATH)
 
-	#Join train and user
 	train_join_users = pd.merge(train_data, users, left_on="User", right_on="RESPID")
-	#Join train and user, with word
 	train_join_users_join_words = pd.merge(train_join_users, words, left_on=["Artist", "User"], right_on=["Artist", "User"])
 
 	cols = [col for col in train_join_users_join_words.columns if col not in ["Rating", "HEARD_OF", "OWN_ARTIST_MUSIC", "GENDER", "WORKING", "REGION", "MUSIC", 'Unnamed: 0_x', 'Unnamed: 0_y']]
@@ -53,28 +52,27 @@ def save_to_pickle(data, filename):
 	f.close()
 
 def main():
-	#Load
 	X_A, Y_A, X_B, Y_B, X_C, Y_C, X_AB, Y_AB = load_data()
-	#Add more features
-	X_train, y_train = get_additional_features(X_A, Y_A)
-	X_val, y_val = get_additional_features(X_B, Y_B)
-	X_test, y_test = get_additional_features(X_C, Y_C)
-	X_train_val, y_train_val = get_additional_features(X_AB, Y_AB)
+	X_A, Y_A = get_additional_features(X_A, Y_A)
+	X_B, Y_B = get_additional_features(X_B, Y_B)
+	X_C, Y_C = get_additional_features(X_C, Y_C)
+	X_AB, Y_AB = get_additional_features(X_AB, Y_AB)
 
-	model = Lasso(alpha=0.0001)
-	#Build model
-	model.fit(X_train, y_train)
-	#Use model to predict
-	predicted_result = model.predict(X_train_val)
-	#Calculate error
-	mse = mean_squared_error(y_train_val, predicted_result)
-	print('MSE: ' + str(mse))
+	a = 0.0001
+	print('alpha = {}'.format(a))
+	model = Lasso(alpha=a)
+	model.fit(X_AB, Y_AB)
+
+	predicted_result = model.predict(X_C)
+	mse = mean_squared_error(Y_C, predicted_result)
+	print('C_MSE: {}, C_RMSE: {}'.format(mse, math.sqrt(mse)))
+
 	result = []
 	for i in range(len(predicted_result)):
-		result.append((predicted_result[i], y_train_val[i]))
+		result.append((predicted_result[i], Y_C[i]))
 
-	#Save data
-	save_to_pickle(model, 'lasso_model.pkl')
-	save_to_pickle(result, 'lasso_prediction.pkl')
+	# Save data
+	save_to_pickle(model, 'lasso_model_C.pkl')
+	save_to_pickle(result, 'lasso_prediction_C2.pkl')
 
 main()
