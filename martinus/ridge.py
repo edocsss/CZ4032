@@ -6,12 +6,22 @@ from sklearn.linear_model import Ridge, Lasso, LinearRegression
 from sklearn.cross_validation import cross_val_score
 from sklearn.metrics import mean_squared_error
 
+'''
+Defines the directory of the training data
+The training data are located in three files
+1. <project_directory>/data_split.pkl
+2. <project_directory>/data/users_cleaned_binary.csv
+3. <project_directory>/data/words_cleaned_binary.csv
+'''
 ROOT_PATH = os.path.join("..")
 TRAIN_DATA_PATH = os.path.join(ROOT_PATH, 'data_split.pkl')
 DATA_PATH = os.path.join("..", "data")
 USERS_PATH = os.path.join(DATA_PATH, "users_cleaned_binary.csv")
 WORDS_PATH = os.path.join(DATA_PATH, "words_cleaned_binary.csv")
 
+'''
+Load the training data from data_split.pkl
+'''
 def load_data():
 	f = open(TRAIN_DATA_PATH, 'rb')
 	data_from_pickle = pickle.load(f)
@@ -27,6 +37,11 @@ def load_data():
 	f.close()
 	return X_A, Y_A, X_B, Y_B, X_C, Y_C, X_AB, Y_AB
 
+'''
+Append the training data with additional features.
+Additional features are available in users_cleaned_binary.csv and words_cleaned_binary.csv
+The append process is done by pandas.
+'''
 def get_additional_features(x, y):
 	train_features = pd.DataFrame(data=x, columns=['Artist', 'Track', 'User', 'Time'])
 	train_target = pd.DataFrame(data=y, columns=['Rating'])
@@ -47,11 +62,20 @@ def get_additional_features(x, y):
 	y_result = (train_join_users_join_words[["Rating"]].values)
 	return x_result, y_result
 
+'''
+Save the trained data into a pickle filename.
+'''
 def save_to_pickle(data, filename):
 	f = open(filename, 'wb')
 	pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 	f.close()
 
+'''
+Main function that train the model.
+After the training process,
+1. MSE will be printed on the console.
+2. Two pickle files will be generated, one contains the models whereas the other contains predicted result for ensembled models
+'''
 def main():
 	#Load
 	X_A, Y_A, X_B, Y_B, X_C, Y_C, X_AB, Y_AB = load_data()
@@ -70,6 +94,7 @@ def main():
 	mse = mean_squared_error(y_train_val, predicted_result)
 	print('MSE: ' + str(mse))
 	result = []
+	#The ensemble models requires data to be in the form of (y_predict, y_actual_value)
 	for i in range(len(predicted_result)):
 		result.append((predicted_result[i], y_train_val[i]))
 
