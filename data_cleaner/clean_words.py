@@ -3,6 +3,24 @@ import os
 from data_cleaner import encoding
 import encoding
 
+
+"""
+This script cleans the data found in words.csv.
+There are a number of data cleaning procedures done here:
+1. Empty "HEARD_OF" field --> fill in with "Never heard of"
+2. Empty "OWN_ARTIST_MUSIC" field --> fill in with "Own none of their music"
+3. Empty "LIKE_ARTIST" field --> fill in with the mean of that column
+4. Empty adjective word fields --> fill in with 2 (because it is a boolean value, so need to use a third value)
+
+There are some other optional pre-processing procedures in this script as well.
+For example, Neural Network works better with onehot encoding instead of binary representation of a numerical value.
+
+Thus, we have an option to either clean the Users.csv data using ONEHOT or BINARY encoding.
+For some models, like Random Forest, we found out that BINARY encoding seems to work better while Neural Network works
+better with ONEHOT encoding.
+"""
+
+
 DATA_DIR_PATH = '../data'
 
 

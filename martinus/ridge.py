@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.linear_model import Ridge, Lasso, LinearRegression
 from sklearn.cross_validation import cross_val_score
 from sklearn.metrics import mean_squared_error
+import math
+
 
 '''
 Defines the directory of the training data
@@ -28,11 +30,10 @@ def load_data():
 	X_A = data_from_pickle['X_A']
 	X_B = data_from_pickle['X_B']
 	X_C = data_from_pickle['X_C']
+	X_AB = data_from_pickle['X_AB']
 	Y_A = data_from_pickle['Y_A']
 	Y_B = data_from_pickle['Y_B']
 	Y_C = data_from_pickle['Y_C']
-	#Concatenated_data
-	X_AB = data_from_pickle['X_AB']
 	Y_AB = data_from_pickle['Y_AB']
 	f.close()
 	return X_A, Y_A, X_B, Y_B, X_C, Y_C, X_AB, Y_AB
@@ -79,27 +80,28 @@ After the training process,
 def main():
 	#Load
 	X_A, Y_A, X_B, Y_B, X_C, Y_C, X_AB, Y_AB = load_data()
-	#Add more features
-	X_train, y_train = get_additional_features(X_A, Y_A)
-	X_val, y_val = get_additional_features(X_B, Y_B)
-	X_test, y_test = get_additional_features(X_C, Y_C)
-	X_train_val, y_train_val = get_additional_features(X_AB, Y_AB)
+	X_A, Y_A = get_additional_features(X_A, Y_A)
+	X_B, Y_B = get_additional_features(X_B, Y_B)
+	X_C, Y_C = get_additional_features(X_C, Y_C)
+	X_AB, Y_AB = get_additional_features(X_AB, Y_AB)
 
-	model = Ridge(alpha=0.001)
-	#Build model
-	model.fit(X_train, y_train)
-	#Use model to predict
-	predicted_result = model.predict(X_train_val)
-	#Calculate error
-	mse = mean_squared_error(y_train_val, predicted_result)
-	print('MSE: ' + str(mse))
+	a = 0.001
+	print('Alpha = {}'.format(a))
+
+	model = Ridge(alpha=a)
+	model.fit(X_AB, Y_AB)
+
+	predicted_result = model.predict(X_C)
+	mse = mean_squared_error(Y_C, predicted_result)
+	print('C_MSE: {}, C_RMSE: {}'.format(mse, math.sqrt(mse)))
+
 	result = []
 	#The ensemble models requires data to be in the form of (y_predict, y_actual_value)
 	for i in range(len(predicted_result)):
-		result.append((predicted_result[i], y_train_val[i]))
+		result.append((predicted_result[i], Y_C[i]))
 
 	#Save data
-	save_to_pickle(model, 'ridge_model.pkl')
-	save_to_pickle(result, 'ridge_prediction.pkl')
+	save_to_pickle(model, 'ridge_model_C.pkl')
+	save_to_pickle(result, 'ridge_prediction_C2.pkl')
 
 main()

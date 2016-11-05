@@ -7,7 +7,7 @@ import random
 import numpy as np
 import pandas as pd
 from getopt import getopt
-from helper import *
+from model.helper import *
 
 import theano
 import theano.tensor as T
@@ -21,7 +21,7 @@ from lasagne.regularization import *
 
 if __name__ == '__main__':
     # Hyper-parameters initialization
-    hidden_size = 40
+    hidden_size = 50
     Alpha = 1e-3 # Learning rate
     Beta = 0. # L2 Reg
     max_iter = 1000
@@ -75,12 +75,11 @@ if __name__ == '__main__':
     parameters = get_all_params(neural_network, trainable=True)
     prediction = get_output(neural_network)
     mse = squared_error(prediction, target_var).mean()
-    # mcc = binary_crossentropy(prediction, target_var).mean()
     reg = Beta * regularize_layer_params(neural_network, l2)
     loss = mse + reg
-    # loss = mcc + reg
     updates = sgd(loss, parameters, learning_rate=Alpha)
     train_fn = theano.function([input_var, target_var], loss, updates=updates)
+
     # For CV and testing
     test_fn = theano.function([input_var, target_var], loss)
     predict_fn = theano.function([input_var], prediction)
@@ -92,24 +91,25 @@ if __name__ == '__main__':
     best_params = get_all_param_values(neural_network) # and best params
     print('Training start...')
     training_start_time = time.time()
+
     # Training
     for it in range(max_iter):
         train_err = train_fn(X_train, y_train)
         val_err = test_fn(X_val, y_val)
-        # print(train_err, val_err)
+
         if val_err < best_val_err:
             best_val_err = val_err
             best_params = get_all_param_values(neural_network)
             n_tol = 0
         else:
             n_tol = n_tol + 1
+
         if n_tol == max_tol:
             print('>>> Validation err is no longer improving')
             break
+
     print('Training duration: %.4f (%d epoch out of %d)' % (time.time() - training_start_time, it + 1, max_iter))
     print('Training loss: %.9f, val loss: %.9f, best val err: %.9f' % (train_err, val_err, best_val_err))
-
-    # result = predict_fn(X_test)
 
     # Saving model to pickle file
     with open('nn_params.pkl', 'wb') as f:
