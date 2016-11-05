@@ -8,7 +8,7 @@ Gradient-Boosting Regressor
 - Numpy
 
 ## Training
-`python model_gbr.py`
+`python3 model_gbr.py`
 
 ## Predicting
-`pythong predict_gby.py`
+`python3 predict_gby.py`

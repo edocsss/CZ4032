@@ -106,6 +106,6 @@ if __name__ == '__main__':
     X_A, Y_A, X_B, Y_B, X_C, Y_C = read_data_set()
     predictions = predict_ratings_and_calculate_mse(X_C, Y_C)
 
-    f = gzip.GzipFile('lr_by_artist_training_predictions_result_C2.zip', 'wb')
+    f = gzip.GzipFile('lr_by_artist_training_predictions_result_C.zip', 'wb')
     pickle.dump(predictions, f)
     f.close()

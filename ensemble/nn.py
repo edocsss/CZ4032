@@ -21,28 +21,28 @@ from model.helper import *
 from sklearn.metrics import mean_squared_error
 
 # Load the results of linear regression by artist models
-def lr_by_artist(suffix='C_NN'):
+def lr_by_artist(suffix='C'):
     filename='../edwin/lr_by_artist/lr_by_artist_training_predictions_result_{}.zip'.format(suffix)
     y=np.array(pickle.load(gzip.GzipFile(filename)))
     return y
 
 
 # Load the results of Random Forest by artist models
-def rf_by_artist(suffix='C_NN'):
+def rf_by_artist(suffix='C'):
     filename='../edwin/rf_by_artist/rf_by_artist_training_predictions_result_{}.zip'.format(suffix)
     y=np.array(pickle.load(gzip.GzipFile(filename)))
     return y
 
 
 # Load the results of Random Forest using the full data features
-def rf_full(suffix='C_NN'):
+def rf_full(suffix='C'):
     filename='../edwin/rf_full/rf_full_training_predictions_result_{}.zip'.format(suffix)
     y=np.array(pickle.load(gzip.GzipFile(filename)))
     return y
 
 
 # Load the results of Gradient Boosting Regression using the full data features
-def gbr(suffix='C_NN'):
+def gbr(suffix='C'):
     filename='../kenrick/gbr_preds_{}.pkl'.format(suffix)
     with open(filename, 'rb') as f:
         y=np.array(pickle.load(f))
@@ -50,7 +50,7 @@ def gbr(suffix='C_NN'):
 
 
 # Load the results of the individual Neural Network using the full data features
-def nn(suffix='C_NN'):
+def nn(suffix='C'):
     filename='../model/nn_y_{}_hat.pkl'.format(suffix)
     with open(filename, 'rb') as f:
         y=pickle.load(f)
@@ -59,7 +59,7 @@ def nn(suffix='C_NN'):
 
 
 # Load the results of the Random Forest by User Demographics data
-def rf1(suffix='C_NN'):
+def rf1(suffix='C'):
     filename='../model/rf1_y_{}_hat.pkl'.format(suffix)
     with open(filename, 'rb') as f:
         y=pickle.load(f)
@@ -67,7 +67,7 @@ def rf1(suffix='C_NN'):
 
 
 # Load the results of the Random Forest by Questions and Words data
-def rf2(suffix='C_NN'):
+def rf2(suffix='C'):
     filename='../model/rf2_y_{}_hat.pkl'.format(suffix)
     with open(filename, 'rb') as f:
         y=pickle.load(f)
@@ -75,7 +75,7 @@ def rf2(suffix='C_NN'):
 
 
 # Load the results of the Lasso Regression model using the full data features
-def lasso(suffix='C_NN'):
+def lasso(suffix='C'):
     filename='../martinus/lasso_prediction_{}.pkl'.format(suffix)
     with open(filename, 'rb') as f:
         y=np.array(pickle.load(f))
@@ -83,7 +83,7 @@ def lasso(suffix='C_NN'):
 
 
 # Load the results of the Linear Regression model using the full data features
-def linear_reg(suffix='C_NN'):
+def linear_reg(suffix='C'):
     filename='../martinus/linear_regression_prediction_{}.pkl'.format(suffix)
     y=np.zeros((0,2))
     with open(filename, 'rb') as f:
@@ -96,7 +96,7 @@ def linear_reg(suffix='C_NN'):
 
 
 # Load the results of the Ridge Regression model using the full data features
-def ridge(suffix='C_NN'):
+def ridge(suffix='C'):
     filename='../martinus/ridge_prediction_{}.pkl'.format(suffix)
     y=np.zeros((0,2))
     with open(filename, 'rb') as f:
@@ -109,17 +109,18 @@ def ridge(suffix='C_NN'):
 
 
 # List of methods that will be called later
+# Remove methods if needed in order to get the best 3 models (GBR full, RF full, RF by artist ID)
 handlers=[
-    # lr_by_artist,
+    lr_by_artist,
     rf_by_artist,
     rf_full,
     gbr,
-    # nn,
-    # rf1,
-    # rf2,
-    # lasso,
-    # linear_reg,
-    # ridge,
+    nn,
+    rf1,
+    rf2,
+    lasso,
+    linear_reg,
+    ridge,
 ]
 
 # Reading all training data with the given suffix
@@ -247,7 +248,7 @@ with open('nn_params.pkl', 'wb') as f:
 # Read data using the handler functions
 full_data = []
 for handler in handlers:
-    data = handler(suffix='C_NN')
+    data = handler(suffix='C')
     full_data.append(data.tolist())
 
 X_C = []

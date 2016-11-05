@@ -70,6 +70,6 @@ if __name__ == '__main__':
         result.append((predictions[i], Y_C[i]))
 
     # Store the prediction for future ensemble NN training
-    f = gzip.GzipFile('rf_full_training_predictions_result_C_NN.zip', 'wb')
+    f = gzip.GzipFile('rf_full_training_predictions_result_C.zip', 'wb')
     pickle.dump(result, f)
     f.close()

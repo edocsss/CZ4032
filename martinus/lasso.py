@@ -98,6 +98,6 @@ def main():
 
 	# Save data
 	save_to_pickle(model, 'lasso_model_C.pkl')
-	save_to_pickle(result, 'lasso_prediction_C2.pkl')
+	save_to_pickle(result, 'lasso_prediction_C.pkl')
 
 main()

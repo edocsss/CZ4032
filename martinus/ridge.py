@@ -102,6 +102,6 @@ def main():
 
 	#Save data
 	save_to_pickle(model, 'ridge_model_C.pkl')
-	save_to_pickle(result, 'ridge_prediction_C2.pkl')
+	save_to_pickle(result, 'ridge_prediction_C.pkl')
 
 main()

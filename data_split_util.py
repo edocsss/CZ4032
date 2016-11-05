@@ -38,6 +38,7 @@ def build_data_split():
     X_matrix = train_df.drop('Rating', axis=1).values.astype(float)
     Y_matrix = train_df['Rating'].values.astype(float)
 
+    # Change the splitting ratio according to the experiment you would like to test
     X_A, X_C, Y_A, Y_C = train_test_split(X_matrix, Y_matrix, train_size=0.8)
     X_A, X_B, Y_A, Y_B = train_test_split(X_A, Y_A, train_size=0.5)
 
@@ -56,8 +57,4 @@ def build_data_split():
 
 
 if __name__ == '__main__':
-    # build_data_split()
-    data = read_data_split()
-    print(len(data['X_A']))
-    print(len(data['X_AB']))
-    print(len(data['X_C']))
+    build_data_split()

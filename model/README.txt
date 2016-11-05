@@ -10,7 +10,7 @@ Requirements:
 - Theano 
 
 Training & Predicting:
-`python nn.py`
+`python3 nn.py`
 
 +--------------------------------------------------------------------+
 | RandomForest by User and their music habit (rf_by_demographics.py) |
@@ -23,7 +23,7 @@ Requirements:
 - Scikit-learn
 
 Training & Predicting:
-`python rf_by_demographics.py`
+`python3 rf_by_demographics.py`
 
 +-----------------------------------------------------------------------+
 | RandomForest by User and their music habit (rf_by_questions_words.py) |
@@ -36,4 +36,4 @@ Requirements:
 - Scikit-learn
 
 Training & Predicting:
-`python rf_by_questions_words.py`
+`python3 rf_by_questions_words.py`

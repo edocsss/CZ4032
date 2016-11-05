@@ -135,6 +135,6 @@ res = []
 for i in range(len(preds)):
     res.append((preds[i], y_train_and_val[i]))
 
-fp = open('gbr_preds.pkl', 'wb')
+fp = open('gbr_preds_C.pkl', 'wb')
 pickle.dump(res, fp, protocol=pickle.HIGHEST_PROTOCOL)
 fp.close()
